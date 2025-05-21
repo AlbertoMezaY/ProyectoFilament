@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
+use App\Mail\UserRegistered;
 use App\Models\User;
 use App\Mail\RegistroExitoso;
 use Illuminate\Http\Request;
@@ -35,9 +36,9 @@ class RegisterController extends Controller
             'password' => Hash::make($request->password),
         ]);
 
-        Mail::to($user->email)->send(new RegistroExitoso($user->name));
+        Mail::to($user->email)->send(new UserRegistered($user->name));
 
        // Auth::login($user);
-        return redirect()->route('dashboard');
+        return redirect()->route('register');
     }
 }

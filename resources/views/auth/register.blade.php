@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <title>Registro</title>
-    <link href="{{ asset('css/estilos.css') }}" rel="stylesheet">
+    <link href="{{ asset('estilos.css') }}" rel="stylesheet">
 </head>
 <body>
     <div class="form-container">
@@ -26,12 +26,13 @@
             <input name="edad" type="number" placeholder="Edad" value="{{ old('edad') }}" required>
             <input name="email" type="email" placeholder="Correo electrónico" value="{{ old('email') }}" required>
             <input name="password" type="password" placeholder="Contraseña" required>
+            <input name="password_confirmation" type="password" placeholder="Confirmar Contraseña" required>
             
 
             <button type="submit">Registrarse</button>
         </form>
 
-        <a class="">¿Ya tienes una cuenta? Inicia sesión</a>
+        <a href="{{ url('/admin/login') }}">¿Ya tienes una cuenta? Inicia sesión</a>
     </div>
 </body>
 </html>
