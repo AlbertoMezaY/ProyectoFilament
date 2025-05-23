@@ -6,9 +6,9 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
-use Filament\Models\Contracts\FilamentUser;
+
 use Spatie\Permission\Traits\HasRoles;
-class User extends Authenticatable implements FilamentUser
+class User extends Authenticatable 
 {
     /** @use HasFactory<\Database\Factories\UserFactory> */
     use HasFactory, Notifiable;
@@ -55,8 +55,10 @@ class User extends Authenticatable implements FilamentUser
     return trim("{$this->name} {$this->apellidos}") ?: $this->email;
 }
 
-    public function canAccessPanel(\Filament\Panel $panel): bool
-{
-    return true; // Aquí puedes filtrar por roles si quieres
-}
+public static function shouldRegisterNavigation(): bool
+    {
+        return auth()->user()?->hasRole('SuperAdmin') ?? false;
+    }
+
+    
 }

@@ -10,34 +10,60 @@ class RoleSeeder extends Seeder
 {
     public function run(): void
     {
-        // 1. Crear permisos si no existen
-        $permissions = [
-            'view users',
-            'create users',
-            'update users',
-            'delete users',
+         // Roles
+        $roles = [
+            'Super Admin',
+            'Administrator',
+            'Editor',
+            'Author',
+            'Contributor',
+            'Subscriber',
         ];
 
-        foreach ($permissions as $permission) {
-            Permission::firstOrCreate(['name' => $permission, 'guard_name' => 'web']);
+        foreach ($roles as $roleName) {
+            Role::firstOrCreate(['name' => $roleName]);
         }
 
-        // 2. Crear roles
-        $super = Role::firstOrCreate(['name' => 'SuperAdmin']);
-        $admin = Role::firstOrCreate(['name' => 'Administrator']);
-        $subscriber = Role::firstOrCreate(['name' => 'Subscriber']);
+        // Permisos
+        $permissions = Permission::pluck('name')->toArray();
 
-        // 3. Asignar permisos
-        $super->syncPermissions(Permission::all());
+        // Asignar todos los permisos al Super Admin
+        Role::findByName('super admin')->syncPermissions($permissions);
 
-        $admin->syncPermissions([
-            'view users',
-            'create users',
-            'update users',
+        // Permisos para Administrator
+        Role::findByName('administrator')->syncPermissions([
+            'view_user',
+            'view_any_user',
+            'create_user',
+            'update_user',
+            'delete_user',
+            'delete_any_user',
+            'restore_user',
+            'restore_any_user',
+            'replicate_user',
+            'reorder_user',
+            'force_delete_user',
+            'force_delete_any_user',
         ]);
 
-        $subscriber->syncPermissions([
-            'view users',
+        // Permisos para Editor
+        Role::findByName('editor')->syncPermissions([
+            'view_user',
+            'view_any_user',
+            'create_user',
+            'update_user',
         ]);
+
+        // Permisos para Author
+        Role::findByName('author')->syncPermissions([
+            'view_user',
+            'view_any_user',
+        ]);
+
+        // Permisos para Contributor
+        Role::findByName('contributor')->syncPermissions([]);
+
+        // Permisos para Subscriber
+        Role::findByName('subscriber')->syncPermissions([]);
     }
 }
