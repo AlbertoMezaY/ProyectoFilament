@@ -1,14 +1,14 @@
 ==============================
-   REGISTRO EXITOSO
+   {{ __('mensajes.exito_mail') }}
 ==============================
 
-Hola, {{ $user->name }}!
+{{ __('mensajes.hola_mail') }}, {{ $user->name }}!
 
-Te acabas de registrar exitosamente en nuestra plataforma.
+{{ __('mensajes.registro_mail') }}
 
-🔗 Iniciar sesión:
+🔗 {{ __('mensajes.inicio_sesion_mail') }}
 {{ $url }}
 
 ------------------------------
-Gracias,  
-Hunabku
+{{ __('mensajes.gracias_mail') }},  
+{{ __('mensajes.hunabku_mail') }}

@@ -27,43 +27,41 @@ class RoleSeeder extends Seeder
         // Permisos
         $permissions = Permission::pluck('name')->toArray();
 
-        // Asignar todos los permisos al Super Admin
-        Role::findByName('super admin')->syncPermissions($permissions);
+       // Asignar todos los permisos al Super Admin
+ Role::findByName('Super Admin')->syncPermissions($permissions);
 
-        // Permisos para Administrator
-        Role::findByName('administrator')->syncPermissions([
-            'view_user',
-            'view_any_user',
-            'create_user',
-            'update_user',
-            'delete_user',
-            'delete_any_user',
-            'restore_user',
-            'restore_any_user',
-            'replicate_user',
-            'reorder_user',
-            'force_delete_user',
-            'force_delete_any_user',
-        ]);
+// Permisos para Administrator
+ Role::findByName('Administrator')->syncPermissions([
+    'view_user',
+    'view_any_user',
+    'create_user',
+    'update_user',
+    'delete_user',
+    'delete_any_user',
+    'restore_user',
+    'restore_any_user',
+    'replicate_user',
+    'reorder_user',
+    'force_delete_user',
+    'force_delete_any_user',
+]);
 
-        // Permisos para Editor
-        Role::findByName('editor')->syncPermissions([
-            'view_user',
-            'view_any_user',
-            'create_user',
-            'update_user',
-        ]);
+// Permisos para Editor
+ Role::findByName('Editor')->syncPermissions([
+    'view_user',
+    'view_any_user',
+    'create_user',
+    'update_user',
+]);
 
-        // Permisos para Author
-        Role::findByName('author')->syncPermissions([
-            'view_user',
-            'view_any_user',
-        ]);
+// Permisos para Author
+ Role::findByName('Author')->syncPermissions([
+    'view_user',
+    'view_any_user',
+]);
 
-        // Permisos para Contributor
-        Role::findByName('contributor')->syncPermissions([]);
-
-        // Permisos para Subscriber
-        Role::findByName('subscriber')->syncPermissions([]);
+// Contributor y Subscriber sin permisos adicionales
+Role::findByName('Contributor')->syncPermissions([]);
+Role::findByName('Subscriber')->syncPermissions([]);
     }
 }

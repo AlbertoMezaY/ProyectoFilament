@@ -1,15 +1,15 @@
 <x-mail::message>
-# Registro Exitoso
+# {{ __('mensajes.exito_mail') }}
 
-Hola, {{ $name }}!
+{{ __('mensajes.hola_mail') }}, {{ $name }}!
 
-Te acabas de registrar exitosamente en nuestra plataforma.
+{{ __('mensajes.registro_mail') }}
 
 <x-mail::button :url="url('admin/login')" color="primary">
-Iniciar Sesión
+{{ __('mensajes.inicio_sesion_mail') }}
 </x-mail::button>
 
-Gracias,<br>
-Hunabku
+{{ __('mensajes.gracias_mail') }},<br>
+{{ __('mensajes.hunabku_mail') }}
 {{-- {{ config('Hunabku') }} --}}
 </x-mail::message>

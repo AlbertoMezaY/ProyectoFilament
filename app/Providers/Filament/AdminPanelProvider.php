@@ -38,6 +38,12 @@ class AdminPanelProvider extends PanelProvider
             ])
             ->discoverWidgets(in: app_path('Filament/Widgets'), for: 'App\\Filament\\Widgets')
             ->widgets([
+                \App\Filament\Widgets\Bienvenida::class,
+                \App\Filament\Widgets\Administrator::class,
+                \App\Filament\Widgets\Editor::class,
+                \App\Filament\Widgets\Author::class,
+                \App\Filament\Widgets\Contributor::class,
+                \App\Filament\Widgets\Subscriber::class,
                 Widgets\AccountWidget::class,
                 Widgets\FilamentInfoWidget::class,
             ])
@@ -58,8 +64,18 @@ class AdminPanelProvider extends PanelProvider
 
              ->plugins([
                 FilamentShieldPlugin::make()
+                
+             ])
+
+             ->resources([
+                \App\Filament\Resources\BlogResource::class,
+                \App\Filament\Resources\UserResource::class,
+             //   \App\Filament\Resources\RoleResource::class, // Asegúrate de que RoleResource también esté incluido
             ]);
 
+            
+
+           
     }
 
     

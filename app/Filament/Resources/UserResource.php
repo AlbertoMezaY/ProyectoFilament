@@ -29,15 +29,15 @@ class UserResource extends Resource
     public static function form(Form $form): Form
     {
       $isOwnProfile = auth()->user() && auth()->user()->is($form->getRecord());
-    $isSuperAdminEditingAnotherSuperAdmin = auth()->user() && auth()->user()->hasRole('SuperAdmin') 
-        && $form->getRecord() && $form->getRecord()->hasRole('SuperAdmin') && !$isOwnProfile;
+    $issuper_adminEditingAnothersuper_admin = auth()->user() && auth()->user()->hasRole('super_admin') 
+        && $form->getRecord() && $form->getRecord()->hasRole('super_admin') && !$isOwnProfile;
     $isAdministratorEditingRestrictedUser = auth()->user() && auth()->user()->hasRole('Administrator')
-        && $form->getRecord() && ($form->getRecord()->hasRole('Administrator') || $form->getRecord()->hasRole('SuperAdmin')) && !$isOwnProfile;
+        && $form->getRecord() && ($form->getRecord()->hasRole('Administrator') || $form->getRecord()->hasRole('super_admin')) && !$isOwnProfile;
     $isSubscriberEditingOtherUser = auth()->user() && auth()->user()->hasRole('Subscriber') && !$isOwnProfile;
     $isEditorEditingRestrictedUser = auth()->user() && auth()->user()->hasRole('Editor')
-        && $form->getRecord() && ($form->getRecord()->hasRole('SuperAdmin') || $form->getRecord()->hasRole('Administrator') || ($form->getRecord()->hasRole('Editor') && !$isOwnProfile));
+        && $form->getRecord() && ($form->getRecord()->hasRole('super_admin') || $form->getRecord()->hasRole('Administrator') || ($form->getRecord()->hasRole('Editor') && !$isOwnProfile));
 
-    $isRestricted = $isSuperAdminEditingAnotherSuperAdmin || $isAdministratorEditingRestrictedUser || $isSubscriberEditingOtherUser || $isEditorEditingRestrictedUser;
+    $isRestricted = $issuper_adminEditingAnothersuper_admin || $isAdministratorEditingRestrictedUser || $isSubscriberEditingOtherUser || $isEditorEditingRestrictedUser;
 
     return $form->schema([
         Section::make('Información del usuario')
@@ -73,7 +73,7 @@ class UserResource extends Resource
                     ->required(fn (string $context) => $context === 'create')
                     ->dehydrated(fn ($state) => filled($state))
                     ->maxLength(255)
-                    ->visibleOn('create'),
+                  //  ->visibleOn('create'),
             ]),
 
         Section::make('Rol')
@@ -83,7 +83,7 @@ class UserResource extends Resource
                     ->multiple()
                     ->relationship('roles', 'name')
                     ->preload()
-                    ->visible(fn () => auth()->user()->hasAnyRole(['SuperAdmin', 'Administrator']) && !$isRestricted),
+                    ->visible(fn () => auth()->user()->hasAnyRole(['super_admin', 'Administrator'])),
             ]),
     ]);
     }
@@ -105,38 +105,38 @@ class UserResource extends Resource
             Tables\Actions\EditAction::make()
                 ->visible(function (Model $record) {
                     $authUser = auth()->user();
-                    // SuperAdmin no puede editar a otro SuperAdmin
-                    $isSuperAdminEditingAnotherSuperAdmin = $authUser->hasRole('SuperAdmin') && $record->hasRole('SuperAdmin');
-                    // Administrator no puede editar a otro Administrator ni a SuperAdmin
-                    $isAdministratorEditingRestrictedUser = $authUser->hasRole('Administrator') && ($record->hasRole('Administrator') || $record->hasRole('SuperAdmin'));
+                    // super_admin no puede editar a otro super_admin
+                    $issuper_adminEditingAnothersuper_admin = $authUser->hasRole('super_admin') && $record->hasRole('super_admin');
+                    // Administrator no puede editar a otro Administrator ni a super_admin
+                    $isAdministratorEditingRestrictedUser = $authUser->hasRole('Administrator') && ($record->hasRole('Administrator') || $record->hasRole('super_admin'));
                     // Subscriber solo puede editar su propio perfil
                     $isSubscriberEditingOtherUser = $authUser->hasRole('Subscriber') && !$authUser->is($record);
-                    // Editor no puede editar a SuperAdmin, Administrator ni a otro Editor
-                    $isEditorEditingRestrictedUser = $authUser->hasRole('Editor') && ($record->hasRole('SuperAdmin') || $record->hasRole('Administrator') || ($record->hasRole('Editor') && !$authUser->is($record)));
-                    return !($isSuperAdminEditingAnotherSuperAdmin || $isAdministratorEditingRestrictedUser || $isSubscriberEditingOtherUser || $isEditorEditingRestrictedUser) || $authUser->is($record);
+                    // Editor no puede editar a super_admin, Administrator ni a otro Editor
+                    $isEditorEditingRestrictedUser = $authUser->hasRole('Editor') && ($record->hasRole('super_admin') || $record->hasRole('Administrator') || ($record->hasRole('Editor') && !$authUser->is($record)));
+                    return !($issuper_adminEditingAnothersuper_admin || $isAdministratorEditingRestrictedUser || $isSubscriberEditingOtherUser || $isEditorEditingRestrictedUser) || $authUser->is($record);
                 }),
             Tables\Actions\DeleteAction::make()
                 ->visible(function (Model $record) {
                     $authUser = auth()->user();
-                    // SuperAdmin no puede eliminar a otro SuperAdmin
-                    $isSuperAdminDeletingAnotherSuperAdmin = $authUser->hasRole('SuperAdmin') && $record->hasRole('SuperAdmin');
-                    // Administrator no puede eliminar a otro Administrator ni a SuperAdmin
-                    $isAdministratorDeletingRestrictedUser = $authUser->hasRole('Administrator') && ($record->hasRole('Administrator') || $record->hasRole('SuperAdmin'));
+                    // super_admin no puede eliminar a otro super_admin
+                    $issuper_adminDeletingAnothersuper_admin = $authUser->hasRole('super_admin') && $record->hasRole('super_admin');
+                    // Administrator no puede eliminar a otro Administrator ni a super_admin
+                    $isAdministratorDeletingRestrictedUser = $authUser->hasRole('Administrator') && ($record->hasRole('Administrator') || $record->hasRole('super_admin'));
                     // Subscriber no puede eliminar a nadie
                     $isSubscriber = $authUser->hasRole('Subscriber');
                     // Editor no tiene permiso para eliminar
                     $isEditor = $authUser->hasRole('Editor');
                     return ($authUser->can('delete_user') || $authUser->can('delete_any_user'))
-                        && !($isSuperAdminDeletingAnotherSuperAdmin || $isAdministratorDeletingRestrictedUser || $isSubscriber || $isEditor);
+                        && !($issuper_adminDeletingAnothersuper_admin || $isAdministratorDeletingRestrictedUser || $isSubscriber || $isEditor);
                 })
                 ->disabled(function (Model $record) {
                     $authUser = auth()->user();
-                    return $authUser && $authUser->is($record) && $authUser->hasAnyRole(['SuperAdmin', 'Administrator']);
+                    return $authUser && $authUser->is($record) && $authUser->hasAnyRole(['super_admin', 'Administrator']);
                 })
                 ->modalHeading('Confirmar Eliminación')
                 ->modalDescription(function (Model $record) {
                     $authUser = Auth::user();
-                    return $authUser && $authUser->is($record) && $authUser->hasAnyRole(['SuperAdmin', 'Administrator'])
+                    return $authUser && $authUser->is($record) && $authUser->hasAnyRole(['super_admin', 'Administrator'])
                         ? 'No puedes eliminarte a ti mismo como Super Admin o Administrador.'
                         : '¿Estás seguro de que deseas eliminar este usuario?';
                 }),
@@ -168,6 +168,6 @@ class UserResource extends Resource
 
    /* Public static function canViewAny(): bool
 {
-    return auth()->user()?->hasAnyRole(['SuperAdmin', 'Administrator']);
+    return auth()->user()?->hasAnyRole(['super_admin', 'Administrator']);
 }*/
 }

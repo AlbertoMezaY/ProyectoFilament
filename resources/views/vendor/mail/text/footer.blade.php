@@ -1,1 +1,1 @@
- © {{ date('Y') }} Hunabku. All rights reserved.
+ © {{ date('Y') }} {{ __('mensajes.derechos_mail') }}

@@ -60,5 +60,10 @@ public static function shouldRegisterNavigation(): bool
         return auth()->user()?->hasRole('SuperAdmin') ?? false;
     }
 
+    public function blogs()
+    {
+        return $this->hasMany(Blog::class);
+    }
+
     
 }
