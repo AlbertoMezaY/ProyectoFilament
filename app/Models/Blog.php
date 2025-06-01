@@ -20,6 +20,16 @@ class Blog extends Model
     
 }
 
+    public function categories()
+    {
+        return $this->belongsToMany(Category::class);
+    }
+
+    public function tags()
+    {
+        return $this->belongsToMany(Tag::class);
+    }
+
 protected function slug(): Attribute
     {
         return Attribute::make(

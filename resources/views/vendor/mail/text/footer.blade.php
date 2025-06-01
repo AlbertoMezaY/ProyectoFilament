@@ -1,1 +1,1 @@
- © {{ date('Y') }} {{ __('mensajes.derechos_mail') }}
+ © {{ date('Y') }} {{ __('mail.derechos_mail') }}

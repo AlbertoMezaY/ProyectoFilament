@@ -40,35 +40,35 @@ class UserResource extends Resource
     $isRestricted = $issuper_adminEditingAnothersuper_admin || $isAdministratorEditingRestrictedUser || $isSubscriberEditingOtherUser || $isEditorEditingRestrictedUser;
 
     return $form->schema([
-        Section::make('Información del usuario')
+        Section::make(__('user.info_usu'))
             ->schema([
                 TextInput::make('name')
-                    ->label('Nombre')
+                    ->label(__('user.nombre_usu'))
                     ->required()
                     ->maxLength(255)
                     ->disabled(fn () => $isRestricted),
 
                 TextInput::make('apellidos')
-                    ->label('Apellidos')
+                    ->label(__('user.ape_usu'))
                     ->required()
                     ->maxLength(255)
                     ->disabled(fn () => $isRestricted),
 
                 TextInput::make('edad')
-                    ->label('Edad')
+                    ->label(__('user.edad_usu'))
                     ->required()
                     ->maxLength(255)
                     ->disabled(fn () => $isRestricted),
 
                 TextInput::make('email')
-                    ->label('Correo electrónico')
+                    ->label(__('user.mail_usu'))
                     ->required()
                     ->email()
                     ->unique(ignoreRecord: true)
                     ->disabled(fn () => $isRestricted),
 
                 TextInput::make('password')
-                    ->label('Contraseña')
+                    ->label(__('user.contrasenia_usu'))
                     ->password()
                     ->required(fn (string $context) => $context === 'create')
                     ->dehydrated(fn ($state) => filled($state))
@@ -79,7 +79,7 @@ class UserResource extends Resource
         Section::make('Rol')
             ->schema([
                 Select::make('roles')
-                    ->label('Asignar rol')
+                    ->label(__('user.rol_usu'))
                     ->multiple()
                     ->relationship('roles', 'name')
                     ->preload()
@@ -93,12 +93,12 @@ class UserResource extends Resource
       return $table
         ->columns([
             TextColumn::make('id')->sortable(),
-            TextColumn::make('name')->label('Nombre')->searchable(),
-            TextColumn::make('apellidos')->label('Apellidos')->searchable(),
-            TextColumn::make('edad')->label('Edad')->sortable(),
-            TextColumn::make('email')->label('Correo')->searchable(),
-            TextColumn::make('roles.name')->label('Roles')->sortable(),
-            TextColumn::make('created_at')->label('Creado')->dateTime(),
+            TextColumn::make('name')->label(__('user.nombre_usu'))->searchable(),
+            TextColumn::make('apellidos')->label(__('user.ape_usu'))->searchable(),
+            TextColumn::make('edad')->label(__('user.edad_usu'))->sortable(),
+            TextColumn::make('email')->label(__('user.mail_usu'))->searchable(),
+            TextColumn::make('roles.name')->label(__('user.rol_list_usu'))->sortable(),
+            TextColumn::make('created_at')->label(__('user.creado_usu'))->dateTime(),
         ])
         ->actions([
             Tables\Actions\ViewAction::make(),

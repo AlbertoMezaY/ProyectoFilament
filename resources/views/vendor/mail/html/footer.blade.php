@@ -4,7 +4,7 @@
 <tr>
 <td class="content-cell" align="center">
     <p style="text-align: center;">
-        © {{ date('Y') }} {{ __('mensajes.derechos_mail') }}
+        © {{ date('Y') }} {{ __('mail.derechos_mail') }}
     </p>
 </td>
 </tr>

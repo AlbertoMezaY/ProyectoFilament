@@ -2,35 +2,31 @@
 
 namespace App\Filament\Resources;
 
-use App\Filament\Resources\CategoryResource\Pages;
-use App\Filament\Resources\CategoryResource\RelationManagers;
-use App\Models\Category;
+use App\Filament\Resources\TagResource\Pages;
+use App\Models\Tag;
 use Filament\Forms;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
-use Illuminate\Database\Eloquent\Builder;
 
-use Illuminate\Database\Eloquent\SoftDeletingScope;
-
-class CategoryResource extends Resource
+class TagResource extends Resource
 {
-    protected static ?string $model = Category::class;
-    protected static ?string $navigationIcon = 'heroicon-o-tag';
+    protected static ?string $model = Tag::class;
+    protected static ?string $navigationIcon = 'heroicon-o-hashtag';
     protected static ?string $navigationGroup = 'BLOG';
 
-    protected static ?string $navigationLabel = 'Categorías';
+    protected static ?string $navigationLabel = 'Etiquetas';
 
     public static function form(Form $form): Form
     {
         return $form
             ->schema([
                 Forms\Components\TextInput::make('name')
-                ->label(__('blog.categoria_a'))
+                ->label(__('blog.etiqueta_a'))
                     ->required()
                     ->maxLength(255),
-                
+               
             ]);
     }
 
@@ -38,7 +34,7 @@ class CategoryResource extends Resource
     {
         return $table
             ->columns([
-                Tables\Columns\TextColumn::make('name')->sortable()->searchable()->label(__('blog.categoria')),
+                Tables\Columns\TextColumn::make('name')->sortable()->searchable() ->label(__('blog.etiqueta')),
                 
                 Tables\Columns\TextColumn::make('created_at')->dateTime() ->label(__('blog.creado_en')),
             ])
@@ -57,9 +53,9 @@ class CategoryResource extends Resource
     public static function getPages(): array
     {
         return [
-            'index' => Pages\ListCategories::route('/'),
-            'create' => Pages\CreateCategory::route('/create') ,
-            'edit' => Pages\EditCategory::route('/{record}/edit'),
+            'index' => Pages\ListTags::route('/'),
+            'create' => Pages\CreateTag::route('/create'),
+            'edit' => Pages\EditTag::route('/{record}/edit'),
         ];
     }
 }

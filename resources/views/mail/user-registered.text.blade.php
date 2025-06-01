@@ -1,14 +1,14 @@
 ==============================
-   {{ __('mensajes.exito_mail') }}
+   {{ __('mail.exito_mail') }}
 ==============================
 
-{{ __('mensajes.hola_mail') }}, {{ $user->name }}!
+{{ __('mail.hola_mail') }}, {{ $user->name }}!
 
-{{ __('mensajes.registro_mail') }}
+{{ __('mail.registro_mail') }}
 
-🔗 {{ __('mensajes.inicio_sesion_mail') }}
+🔗 {{ __('mail.inicio_sesion_mail') }}
 {{ $url }}
 
 ------------------------------
-{{ __('mensajes.gracias_mail') }},  
-{{ __('mensajes.hunabku_mail') }}
+{{ __('mail.gracias_mail') }},  
+{{ __('mail.hunabku_mail') }}

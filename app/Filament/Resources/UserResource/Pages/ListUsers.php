@@ -14,6 +14,7 @@ class ListUsers extends ListRecords
     {
         return [
             Actions\CreateAction::make()
+            ->label(__('user.crear_usu'))
             ->visible(fn () => auth()->user()->can('create_user') || auth()->user()->hasAnyRole(['SuperAdmin', 'Administrator'])),
         
         ];

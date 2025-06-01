@@ -14,8 +14,14 @@ class ListBlogs extends ListRecords
     protected function getHeaderActions(): array
     {
         return [
-            Actions\CreateAction::make(),
+            Actions\CreateAction::make()
+            ->label(__('blog.crear_pub'))
         ];
+    }
+
+    public function getTitle(): string
+    {
+        return __('blog.post'); // Cambia "Crear Blog" por "Nueva Entrada"
     }
 
 

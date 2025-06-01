@@ -9,4 +9,9 @@ use Filament\Resources\Pages\CreateRecord;
 class CreateCategory extends CreateRecord
 {
     protected static string $resource = CategoryResource::class;
+
+    public function getTitle(): string
+    {
+        return __('blog.crear_categoria'); // Cambia "Crear Blog" por "Nueva Entrada"
+    }
 }
