@@ -16,7 +16,8 @@ use Filament\Forms\Components\Hidden;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Database\Eloquent\Model;
 use Filament\Tables\Actions\Action;
-
+use Illuminate\Support\Str;
+use Illuminate\Validation\Rule;
 
 class BlogResource extends Resource
 {
@@ -31,65 +32,86 @@ class BlogResource extends Resource
 
     public static function form(Form $form): Form
     {
-       $record = request()->route('record');
+        $record = request()->route('record');
 
-    if (is_string($record)) {
-        $record = Blog::find($record);
+        if (is_string($record)) {
+            $record = Blog::find($record);
+        }
+
+        $isEditable = !$record || (auth()->check() && auth()->id() === $record?->user_id);
+        $isEditing = $record !== null;
+
+        return $form
+            ->schema([
+                Forms\Components\TextInput::make('titulo')
+                    ->label(__('blog.titulo'))
+                    ->required()
+                    ->maxLength(255)
+                    ->disabled(!$isEditable)
+                    ->reactive()
+                    ->afterStateUpdated(function ($state, callable $set) use ($record) {
+                        $slug = Str::slug($state);
+                        $set('slug', static::generateUniqueSlug($slug, $record));
+                    }),
+                Forms\Components\TextInput::make('slug')
+                    ->label(__('blog.slug'))
+                    ->required()
+                    ->maxLength(255)
+                    ->disabled($isEditing || !$isEditable) // Deshabilitado en modo edición
+                    ->dehydrated()
+                    ->default(fn ($record) => $record?->slug ?? static::generateUniqueSlug(Str::slug($record?->titulo ?? ''), $record))
+                    ->rules([
+                        Rule::unique(Blog::class, 'slug')->ignore($record?->id),
+                    ]),
+                Forms\Components\Select::make('categories')
+                    ->label(__('blog.categoria'))
+                    ->multiple()
+                    ->relationship('categories', 'name')
+                    ->required()
+                    ->preload()
+                    ->dehydrated()
+                    ->disabled(!$isEditable),
+                Forms\Components\Select::make('tags')
+                    ->label(__('blog.etiqueta'))
+                    ->multiple()
+                    ->relationship('tags', 'name')
+                    ->preload()
+                    ->dehydrated()
+                    ->disabled(!$isEditable),
+                Forms\Components\Textarea::make('contenido')
+                    ->label(__('blog.contenido'))
+                    ->required()
+                    ->columnSpanFull()
+                    ->disabled(!$isEditable),
+                Forms\Components\Select::make('user_id')
+                    ->label(__('blog.autor'))
+                    ->options(\App\Models\User::all()->pluck('name', 'id'))
+                    ->required()
+                    ->disabled(!$isEditable)
+                    ->default(fn ($record) => $record?->user_id ?? auth()->id()),
+                Forms\Components\FileUpload::make('imagen')
+                    ->label(__('blog.imagen'))
+                    ->image()
+                    ->disk('public') // Asegúrate de que el disco sea 'public'
+                    ->directory('blog_images') // Carpeta donde se guardan las imágenes
+                    ->nullable()
+                    ->disabled(!$isEditable),
+            ])
+            ->statePath('data')
+            ->model($record ?? Blog::class);
     }
 
-    $isEditable = !$record || (auth()->check() && auth()->id() === $record?->user_id);
+    // Método estático para generar un slug único, ahora fuera de form()
+    public static function generateUniqueSlug($slug, $record = null)
+    {
+        $originalSlug = $slug;
+        $count = 1;
 
-    return $form
-        ->schema([
-            Forms\Components\TextInput::make('titulo')
-                ->label(__('blog.titulo'))
-                ->required()
-                ->maxLength(255)
-                ->disabled(!$isEditable)
-                ->reactive() // Añadimos reactive para que el slug se actualice al cambiar el título
-                ->afterStateUpdated(function ($state, callable $set) {
-                    $set('slug', \Str::slug($state)); // Genera el slug automáticamente
-                }),
-            Forms\Components\TextInput::make('slug')
-                ->label(__('blog.slug'))
-                ->required()
-                ->unique(Blog::class, 'slug', ignoreRecord: true)
-                ->maxLength(255)
-                ->disabled(!$isEditable)
-                ->dehydrated() // Asegura que se guarde el valor generado
-                ->default(fn ($record) => $record?->slug ?? \Str::slug($record?->titulo ?? '')),
-            Forms\Components\Select::make('categories')
-                ->label(__('blog.categoria'))
-                ->multiple()
-                ->relationship('categories', 'name')
-                ->required()
-                ->disabled(!$isEditable),
-            Forms\Components\Select::make('tags')
-                ->label(__('blog.etiqueta'))
-                ->multiple()
-                ->relationship('tags', 'name')
-                ->disabled(!$isEditable),
-            Forms\Components\Textarea::make('contenido')
-                ->label(__('blog.contenido'))
-                ->required()
-                ->columnSpanFull()
-                ->disabled(!$isEditable),
-            Forms\Components\Select::make('user_id') // Cambiamos a user_id para seleccionar el usuario
-                ->label(__('blog.autor'))
-                ->options(\App\Models\User::all()->pluck('name', 'id')) // Lista todos los usuarios
-                ->required()
-                ->disabled(!$isEditable)
-                ->default(fn ($record) => $record?->user_id ?? auth()->id()), // Valor por defecto
-            Forms\Components\FileUpload::make('imagen')
-                ->label(__('blog.imagen'))
-                ->image()
-                ->nullable()
-                ->disabled(!$isEditable),
-            Forms\Components\Hidden::make('user_id') // Este campo ya no es necesario como Hidden
-                ->default(null), // Lo dejamos por compatibilidad, pero será sobrescrito por el Select
-        ])
-        ->statePath('data')
-        ->model($record ?? Blog::class);
+        while (Blog::where('slug', $slug)->where('id', '!=', $record?->id ?? 0)->exists()) {
+            $slug = "{$originalSlug}-" . $count++;
+        }
+
+        return $slug;
     }
 
     public static function table(Table $table): Table
@@ -155,9 +177,22 @@ class BlogResource extends Resource
 }
 
     public static function can(string $ability, ?Model $record = null): bool
-{
-    return $ability !== 'create' || auth()->check(); // Permitir ver y editar solo al autor
-}
+    {
+        if (!auth()->check()) {
+            return false;
+        }
+
+        $user = auth()->user();
+
+        return match ($ability) {
+            'view_any' => $user->hasPermissionTo('view_any_blog'),
+            'view' => $user->hasPermissionTo('view_blog'),
+            'create' => $user->hasPermissionTo('create_blog'),
+            'update' => $user->hasPermissionTo('update_blog'),
+            'delete' => $user->hasPermissionTo('delete_blog'),
+            default => true,
+        };
+    }
 
     public static function getEloquentQuery(): Builder
 {

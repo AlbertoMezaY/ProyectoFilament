@@ -35,6 +35,11 @@ class TagResource extends Resource
         return $table
             ->columns([
                 Tables\Columns\TextColumn::make('name')->sortable()->searchable() ->label(__('blog.etiqueta')),
+
+                 Tables\Columns\TextColumn::make('blogs_count')
+                    ->label('Entradas')
+                    ->counts('blogs')
+                    ->sortable(),
                 
                 Tables\Columns\TextColumn::make('created_at')->dateTime() ->label(__('blog.creado_en')),
             ])

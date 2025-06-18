@@ -11,9 +11,29 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('categories', function (Blueprint $table) {
-            $table->dropColumn('slug');
+       $driver = DB::getDriverName();
+
+        if ($driver === 'sqlite') {
+            DB::statement('PRAGMA foreign_keys = OFF;');
+        } elseif ($driver === 'mysql') {
+            DB::statement('SET FOREIGN_KEY_CHECKS = 0;');
+        }
+
+        Schema::create('categories_temp', function (Blueprint $table) {
+            $table->id();
+            $table->string('name');
+            $table->timestamps();
         });
+
+        DB::statement('INSERT INTO categories_temp (id, name, created_at, updated_at) SELECT id, name, created_at, updated_at FROM categories');
+        Schema::drop('categories');
+        Schema::rename('categories_temp', 'categories');
+
+        if ($driver === 'sqlite') {
+            DB::statement('PRAGMA foreign_keys = ON;');
+        } elseif ($driver === 'mysql') {
+            DB::statement('SET FOREIGN_KEY_CHECKS = 1;');
+        }
     }
 
     /**
@@ -21,8 +41,29 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::table('categories', function (Blueprint $table) {
+       $driver = DB::getDriverName();
+
+        if ($driver === 'sqlite') {
+            DB::statement('PRAGMA foreign_keys = OFF;');
+        } elseif ($driver === 'mysql') {
+            DB::statement('SET FOREIGN_KEY_CHECKS = 0;');
+        }
+
+        Schema::create('categories_temp', function (Blueprint $table) {
+            $table->id();
+            $table->string('name');
             $table->string('slug')->unique()->after('name');
+            $table->timestamps();
         });
+
+        DB::statement('INSERT INTO categories_temp (id, name, created_at, updated_at) SELECT id, name, created_at, updated_at FROM categories');
+        Schema::drop('categories');
+        Schema::rename('categories_temp', 'categories');
+
+        if ($driver === 'sqlite') {
+            DB::statement('PRAGMA foreign_keys = ON;');
+        } elseif ($driver === 'mysql') {
+            DB::statement('SET FOREIGN_KEY_CHECKS = 1;');
+        }
     }
 };

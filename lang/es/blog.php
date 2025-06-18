@@ -32,6 +32,14 @@ return [
     'crear_categoria' => 'Crear Categoría',
     'crear_etiqueta' => 'Crear Etiqueta',
 
+    //blog vista index
+    'titulo_blog' => 'Blog',
+    'publicado_el' => 'Publicado el',
+    'por' => 'por',
+    'no_blog' => 'No hay blogs disponibles.',
+    'simbolo_derechos' => '©',
+    'mensaje_derechos' => 'Todos los derechos reservados.',
+
     
 
     

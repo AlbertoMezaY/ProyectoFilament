@@ -18,6 +18,7 @@ use Illuminate\Routing\Middleware\SubstituteBindings;
 use Illuminate\Session\Middleware\StartSession;
 use Illuminate\View\Middleware\ShareErrorsFromSession;
 use BezhanSalleh\FilamentShield\FilamentShieldPlugin;
+use BezhanSalleh\FilamentShield\FilamentShieldMiddleware;
 
 class AdminPanelProvider extends PanelProvider
 {
@@ -46,17 +47,20 @@ class AdminPanelProvider extends PanelProvider
                 \App\Filament\Widgets\Subscriber::class,
                 Widgets\AccountWidget::class,
                 Widgets\FilamentInfoWidget::class,
+                
             ])
             ->middleware([
                 EncryptCookies::class,
-                AddQueuedCookiesToResponse::class,
-                StartSession::class,
-                AuthenticateSession::class,
-                ShareErrorsFromSession::class,
-                VerifyCsrfToken::class,
-                SubstituteBindings::class,
-                DisableBladeIconComponents::class,
-                DispatchServingFilamentEvent::class,
+    AddQueuedCookiesToResponse::class,
+    StartSession::class,
+    ShareErrorsFromSession::class,
+    VerifyCsrfToken::class,
+    SubstituteBindings::class,
+    DisableBladeIconComponents::class,
+    DispatchServingFilamentEvent::class,
+    'web',
+    //FilamentShieldMiddleware::class,
+                
             ])
             ->authMiddleware([
                 Authenticate::class,
